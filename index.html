@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Une surprise pour toi...</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none; /* Empêche la sélection du texte en cliquant */
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Fond doux "pivoine" au début */
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            color: #4a4a4a;
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            cursor: pointer;
+            transition: background 1s ease, color 1s ease;
+        }
+
+        /* Thème Gamer pour la chute */
+        body.gamer-mode {
+            background: linear-gradient(135deg, #1f1c2c 0%, #928dab 100%);
+            color: #ffffff;
+        }
+
+        .message-container {
+            text-align: center;
+            padding: 20px;
+            /* L'animation par défaut pour la transition */
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+        }
+
+        #text {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.4;
+            white-space: pre-line; /* Permet les retours à la ligne avec \n */
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.5);
+            transition: text-shadow 1s ease;
+        }
+
+        body.gamer-mode #text {
+            text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.8);
+        }
+
+        .hint {
+            display: block;
+            margin-top: 30px;
+            font-size: 1rem;
+            opacity: 0.6;
+            font-weight: normal;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        /* Classes ajoutées en JS pour faire l'effet pétale */
+        .petal-open {
+            transform: scale(1.8);
+            opacity: 0;
+        }
+
+        .petal-new {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="message-container" id="box">
+        <p id="text">Je n'ai pas oublié...</p>
+        <span class="hint" id="hint">(Clique n'importe où)</span>
+    </div>
+
+    <script>
+        // La liste de tes messages
+        const messages = [
+            "Je n'ai pas oublié...",
+            "Ouvre encore 🌸",
+            "Bonne fête du 1er lol !",
+            "Veux-tu être ma....",
+            "Mon adversaire ce soir ? 😈\nRdv Plato !"
+        ];
+
+        let currentIndex = 0;
+        const boxEl = document.getElementById('box');
+        const textEl = document.getElementById('text');
+        const hintEl = document.getElementById('hint');
+        let isAnimating = false; // Empêche de cliquer trop vite
+
+        document.body.addEventListener('click', () => {
+            // Si on anime déjà ou si on est à la fin, on ne fait rien
+            if (isAnimating || currentIndex >= messages.length - 1) return;
+
+            isAnimating = true;
+            currentIndex++;
+
+            // Cache le texte "(Clique n'importe où)" après le 1er clic
+            if (currentIndex === 1) {
+                hintEl.style.display = 'none';
+            }
+
+            // ÉTAPE 1 : Le texte actuel s'ouvre et disparaît (Effet pétale qui tombe)
+            boxEl.classList.add('petal-open');
+
+            setTimeout(() => {
+                // ÉTAPE 2 : On change le texte en arrière-plan
+                textEl.textContent = messages[currentIndex];
+
+                // Si c'est le dernier message (la chute), on change le fond !
+                if (currentIndex === messages.length - 1) {
+                    document.body.classList.add('gamer-mode');
+                }
+
+                // On prépare le texte à être "petit" pour donner un effet de profondeur
+                boxEl.classList.remove('petal-open');
+                boxEl.classList.add('petal-new');
+
+                // ÉTAPE 3 : On fait apparaître le nouveau texte
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        boxEl.classList.remove('petal-new');
+                        isAnimating = false;
+                    }, 50); // Léger délai pour laisser le navigateur recalculer
+                });
+
+            }, 500); // 500ms correspond au temps de l'animation CSS
+        });
+    </script>
+</body>
+</html>
